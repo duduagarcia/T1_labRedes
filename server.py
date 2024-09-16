@@ -1,5 +1,4 @@
-from socket import socket, AF_INET, SOCK_DGRAM, SOCK_STREAM, SHUT_RDWR, timeout
-import json
+from socket import *
 import pprint
 import threading
 import sys 

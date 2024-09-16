@@ -1,4 +1,4 @@
-from socket import socket, timeout, AF_INET, SOCK_DGRAM, SOCK_STREAM
+from socket import *
 import threading
 from sys import argv
 import base64
@@ -98,14 +98,6 @@ class Client:
     def logout(self):
         self.username = None
         self.send_message(['LOGOUT'], self.CONTROLL_SOCKET)
-    
-
-    def print_help(self):
-        print('login                     -> /REG <user>')
-        print('logout                    -> /LOGOUT')
-        print('broadcast message         -> /MSGA <message>')
-        print('private message           -> /MSG [user] <message>')
-        print('private message with file -> /MSGF [user] <file>')
         
 
     def broadcast_message(self, message):
@@ -127,8 +119,6 @@ class Client:
                 self.private_message(msg[1], join_message(msg[2:]))
             elif (option == 'MSGF'): 
                 self.private_message_with_file(msg[1], join_message(msg[2:]))
-            elif (option == 'HELP'):
-                self.print_help()
             elif (option == 'MSGA'):
                 self.broadcast_message(join_message(msg[1:]))
             elif (option == 'REG'):
