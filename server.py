@@ -136,11 +136,11 @@ class Server:
         print(f'message: {message}')
         print(f'clientAddress: {clientAddr}')
         HANDLER = {
-            'login': self.handle_login,
-            'logout': self.handle_logout,
-            'pm': self.handle_private_message,
-            'pmf': self.handle_private_message_with_file,
-            'broadcast': self.handle_broadcast
+            'REG': self.handle_login,
+            'LOGOUT': self.handle_logout,
+            'MSG': self.handle_private_message,
+            'MSGF': self.handle_private_message_with_file,
+            'MSGA': self.handle_broadcast
         }
         data = self.unpack_message(message.decode())
         print(f'data: {data}')
@@ -202,7 +202,7 @@ class Server:
         print('----------------------------')
         print(f'Responding {message[0]}')
         
-        message = f'<pm: {sender}> {message}'
+        message = f'<MSG: {sender}> {message}'
 
         self.respond(message, clientAddr, tcp_socket)
 
@@ -217,7 +217,7 @@ class Server:
         else:
             self.USERS.add(login_data[0], clientAddr[0], clientAddr[1], tcp_socket)
         pprint.pprint(str(self.USERS))
-        self.respond(f'<login> Login success', clientAddr, tcp_socket)
+        self.respond(f'<REG> Login success', clientAddr, tcp_socket)
     
     def handle_logout(self, _, clientAddr, tcp_socket:socket=None):
         print('handle_logout')

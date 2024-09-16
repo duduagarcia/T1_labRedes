@@ -18,7 +18,7 @@ python <server-ip>
 Set a username for a client
 
 ```
-/login <user>
+/REG <user>
 ```
 
 ### Private Message
@@ -26,7 +26,7 @@ Set a username for a client
 Direct message for a user.
 
 ```
-/pm <username> <message>
+/MSG <username> <message>
 ```
 
 ### Private Message With File
@@ -34,7 +34,7 @@ Direct message for a user.
 Transfer a file for a user.
 
 ```
-/pmf <username> <filepath>
+/MSGF <username> <filepath>
 ```
 
 ### Broadcast message 
@@ -42,7 +42,7 @@ Transfer a file for a user.
 Emit a message for all users in the application.
 
 ```
-/all <message>
+/MSGA <message>
 ```
 
 ### Logout

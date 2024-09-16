@@ -84,32 +84,32 @@ class Client:
                 break
 
     def private_message(self, username, message):
-        self.send_message(['pm', username, self.username, message], self.DATA_SOCKET)
+        self.send_message(['MSG', username, self.username, message], self.DATA_SOCKET)
 
     def private_message_with_file(self, username, file_path):
         with open(file_path, 'rb') as file:
             content = file.read()
-        self.send_message(['pmf', username, self.username, base64.b64encode(content)], self.DATA_SOCKET)
+        self.send_message(['MSGF', username, self.username, base64.b64encode(content)], self.DATA_SOCKET)
     
     def login(self, username):
         self.username = username
-        self.send_message(['login', username], self.CONTROLL_SOCKET)
+        self.send_message(['REG', username], self.CONTROLL_SOCKET)
 
     def logout(self):
         self.username = None
-        self.send_message(['logout'], self.CONTROLL_SOCKET)
+        self.send_message(['LOGOUT'], self.CONTROLL_SOCKET)
     
 
     def print_help(self):
-        print('login                     -> /login <user>')
-        print('logout                    -> /logout')
-        print('broadcast message         -> /all <message>')
-        print('private message           -> /pm [user] <message>')
-        print('private message with file -> /pmf [user] <file>')
+        print('login                     -> /REG <user>')
+        print('logout                    -> /LOGOUT')
+        print('broadcast message         -> /MSGA <message>')
+        print('private message           -> /MSG [user] <message>')
+        print('private message with file -> /MSGF [user] <file>')
         
 
     def broadcast_message(self, message):
-        self.send_message(['broadcast', self.username, message], self.DATA_SOCKET)
+        self.send_message(['MSGA', self.username, message], self.DATA_SOCKET)
         pass
 
 
@@ -123,17 +123,17 @@ class Client:
             msg = msg[1:].split(' ')
             option = msg[0]
             if (option == 'exit'): return -1
-            elif (option == 'pm'): 
+            elif (option == 'MSG'): 
                 self.private_message(msg[1], join_message(msg[2:]))
-            elif (option == 'pmf'): 
+            elif (option == 'MSGF'): 
                 self.private_message_with_file(msg[1], join_message(msg[2:]))
-            elif (option == 'help'):
+            elif (option == 'HELP'):
                 self.print_help()
-            elif (option == 'all'):
+            elif (option == 'MSGA'):
                 self.broadcast_message(join_message(msg[1:]))
-            elif (option == 'login'):
+            elif (option == 'REG'):
                 self.login(msg[1])
-            elif (option == 'logout'):
+            elif (option == 'LOGOUT'):
                 self.logout()
             # else: print('invalid command')
         return 0
