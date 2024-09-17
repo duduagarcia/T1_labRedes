@@ -1,14 +1,17 @@
 from socket import *
 import pprint
 import threading
-import sys 
+import sys # manipular argumentos via linha de comando
 
+# usado para conseguir digitar "," nas mensagens
 convert_coma = lambda txt: str(txt).replace('%;', ',')
 
 class Users:
     def __init__(self):
+        # inicia a classe com dicionário vazio para armazenar as infos do user
         self.data = dict()
 
+    # adiciona um usuário ao dicionário, sendo a chave o proprio nome
     def add(self, username, client_ip, client_port, tcp_socket=None):
         new_user = {
             'socket_type': 'tcp' if tcp_socket else 'udp',
@@ -20,6 +23,7 @@ class Users:
         self.data[username] = new_user
         self.data[(client_ip, client_port)] = new_user
 
+    # extrai um usuário do dicionário, bem como o ip e a porta deste usuário
     def remove(self, username):
         ip = self.data[username]['client_ip']
         port = self.data[username]['client_port']
@@ -35,9 +39,6 @@ class Users:
     def get_username(self, user):
         return self.data[user]['username']
     
-    # def set_username(self, user, username):
-    #     self.data[user]['username'] = username
-    
     def get_client_ip(self, user):
         return self.data[user]['client_ip']
     
@@ -50,45 +51,67 @@ class Users:
     def get_socket_type(self, user):
         return self.data[user]['socket_type']
 
+    # auxiliares
+
+    # verifica se user está dentro do dicionário
     def __contains__(self, user):
         return user in self.data
 
+    # toString
     def __str__(self):
         return str(self.data)
     
+    # permite itrar sobre users
     def __iter__(self): 
         return iter(self.data)
 
 class Server:
     def __init__(self, host, port):
+        # define as portas TCP e UDP de uma só vez, ao invés de criar uma aplicaçõa separada para UDP e outra para TCP
         self.HOST = host
         self.UDP_CONTROLL_PORT = int(port)
         self.UDP_DATA_PORT = int(port) + 1
         self.TCP_CONTROLL_PORT = int(port) + 2
         self.TCP_DATA_PORT = int(port) + 3
 
+
+        # Criando os sockets TCP e UDP
+
+        # DATA = gerencia as transferências de mensagens ou arquivos dos clientes
+        # CONTROL = gerencia as conexões e comandos dos clientes
+        
         self.UDP_CONTROLL_SOCKET = socket(AF_INET, SOCK_DGRAM)
         self.UDP_DATA_SOCKET = socket(AF_INET, SOCK_DGRAM)
 
         self.TCP_CONTROLL_SOCKET = socket(AF_INET, SOCK_STREAM)
         self.TCP_DATA_SOCKET = socket(AF_INET, SOCK_STREAM)
         
+        # Dando o binding dos sockets com as portas
         self.TCP_CONTROLL_SOCKET.bind((self.HOST, self.TCP_CONTROLL_PORT))
         self.TCP_DATA_SOCKET.bind((self.HOST, self.TCP_DATA_PORT))
         self.UDP_CONTROLL_SOCKET.bind((self.HOST, self.UDP_CONTROLL_PORT))
         self.UDP_DATA_SOCKET.bind((self.HOST, self.UDP_DATA_PORT))
 
+        # Configura os sockets TCP para usar conexões
         self.TCP_CONTROLL_SOCKET.listen(1)
         self.TCP_DATA_SOCKET.listen(1)
 
         self.USERS = Users()
 
+
+    # Inicia e escuta as conexões tcp com limite de 2s
     def listen_tcp(self, socket:socket):
         socket.settimeout(2)
         print(socket)
         print(f'listening tcp on {socket.getsockname()}')
+
+
         while True:
+
+            # tentando aceitar a conexão do cliente
             try:
+
+                # Se a conexão der certo, pegamos os dados dos clientes e criamos uma nova thread pra conexão
                 clientSocket, clientAddress = socket.accept()
                 client_ip, client_port = clientAddress
                 print(f"Accepted connection from {clientAddress}")
@@ -99,9 +122,12 @@ class Server:
         # socket.shutdown(SHUT_RDWR)
         # socket.close()
 
+    # Trata as mensagens TCP dos clientes
     def listen_user_tcp(self, client_socket:socket, clientAddress):
         client_socket.settimeout(2)
         print(f'listening user tcp on {client_socket.getsockname()}')
+
+        # Loop para receber mensagens dos clientes
         while True:
             try:
                 message = client_socket.recv(1024)
@@ -109,7 +135,7 @@ class Server:
                     print(F'closing socket {client_socket.getsockname()}')
                     client_socket.close()
                     return
-
+                # Exibe e processa a mensagem
                 print(f'{message.decode()} / {client_socket.getsockname()}')
                 self.handle(message, clientAddress, client_socket)
             except  :
@@ -118,6 +144,7 @@ class Server:
         client_socket.shutdown(SHUT_RDWR)
         client_socket.close()
 
+    # Escuta as mensagens UDP
     def listen_udp(self, socket:socket):
         socket.settimeout(2)
         print(f'listening udp on {socket.getsockname()}')
@@ -130,7 +157,7 @@ class Server:
                     socket.close() 
                     return
 
-
+    # Function para descompactar a mensagem e tratar ela no manipulador apropriado
     def handle(self, message, clientAddr, tcp_socket=None):
         print(f'message: {message}')
         print(f'clientAddress: {clientAddr}')
@@ -144,6 +171,7 @@ class Server:
         data = self.unpack_message(message.decode())
         print(f'data: {data}')
         HANDLER[data[0]](data[1:], clientAddr, tcp_socket)
+
 
     def handle_private_message_with_file(self, data, clientAddr, tcp_socket=None):
         print('handle_private_message_with_file')
