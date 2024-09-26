@@ -1,4 +1,4 @@
-from socket import *
+from socket import socket, timeout, AF_INET, SOCK_DGRAM, SOCK_STREAM
 import threading
 from sys import argv
 import base64
@@ -142,7 +142,7 @@ class Client:
 def main():
     server_ip = argv[1]
     protocol  = argv[2]
-    client = Client(server_ip, 12000, protocol)
+    client = Client(server_ip, 40000, protocol)
     try:
         client.run()
     except timeout:

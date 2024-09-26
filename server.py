@@ -282,7 +282,7 @@ class Server:
     
 def main():
     server_ip = sys.argv[1]
-    server = Server(server_ip, 12000)
+    server = Server(server_ip, 40000)
     try:
         server.run()
     except KeyboardInterrupt:
