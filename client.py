@@ -50,7 +50,7 @@ class Client:
         print(message)
 
     def handle_tcp_socket(self, socket:socket):
-        message = socket.recv(1024)
+        message = socket.recv(2048)
         if not message:  
             print('closing socket')
             socket.close()

@@ -130,7 +130,7 @@ class Server:
         # Loop para receber mensagens dos clientes
         while True:
             try:
-                message = client_socket.recv(1024)
+                message = client_socket.recv(2048)
                 if not message:  
                     print(F'closing socket {client_socket.getsockname()}')
                     client_socket.close()
